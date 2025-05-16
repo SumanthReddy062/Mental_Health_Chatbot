@@ -1,369 +1,110 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="soft">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SereneMind | Your Compassionate AI Companion</title>
-    <meta name="description" content="A safe space for mental health support">
+    <title>SereneMind | Mental Health Chatbot</title>
+    <meta name="description" content="A compassionate AI companion">
     
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        serene: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                        },
-                        calm: {
-                            50: '#f5f3ff',
-                            100: '#ede9fe',
-                            200: '#ddd6fe',
-                            300: '#c4b5fd',
-                            400: '#a78bfa',
-                            500: '#8b5cf6',
-                            600: '#7c3aed',
-                            700: '#6d28d9',
-                            800: '#5b21b6',
-                            900: '#4c1d95',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif']
-                    }
-                }
-            }
-        }
-    </script>
-
+    <!-- PWA -->
+    <meta name="theme-color" content="#0ea5e9">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/static/icon-192.png">
+    
     <style>
-        :root {
-            --serene-500: #0ea5e9;
-            --calm-500: #8b5cf6;
-        }
-        
         body {
-            background-color: #f8fafc;
-            color: #1e293b;
+            font-family: 'Inter', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
         }
-        
-        .dark body {
-            background-color: #0f172a;
-            color: #f8fafc;
+        #chatBox {
+            height: 70vh;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
         }
-        
-        .message-entering {
-            animation: gentleAppear 0.4s ease-out;
-        }
-        
-        @keyframes gentleAppear {
-            0% { opacity: 0; transform: translateY(8px) scale(0.98); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        
-        .breathing-animation {
-            animation: breathing 6s ease-in-out infinite;
-        }
-        
-        @keyframes breathing {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-        
-        .mood-selector button.active {
-            transform: scale(1.1);
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.5);
+        .user-message { color: blue; margin-left: auto; }
+        .bot-message { color: green; margin-right: auto; }
+        textarea {
+            width: 100%;
+            padding: 8px;
+            resize: none;
         }
     </style>
 </head>
-<body class="font-sans min-h-screen flex flex-col bg-serene-50 dark:bg-gray-900 transition-colors duration-300">
-    <!-- Mood Check Banner -->
-    <div id="mood-banner" class="bg-serene-600 dark:bg-serene-800 text-white p-3 text-center">
-        <p>How are you feeling today? <button id="mood-toggle" class="underline ml-2">Let me know</button></p>
-    </div>
-    
-    <!-- Main Container -->
-    <div class="container mx-auto px-4 py-8 flex-1 flex flex-col max-w-3xl">
-        <!-- Header -->
-        <header class="mb-8 text-center">
-            <h1 class="text-4xl font-serif font-bold text-serene-700 dark:text-serene-300 mb-2">SereneMind</h1>
-            <p class="text-caln-600 dark:text-caln-400">Your compassionate AI companion</p>
-        </header>
-        
-        <!-- Mood Selector (Hidden by default) -->
-        <div id="mood-selector" class="mood-selector hidden mb-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm">
-            <h3 class="text-lg font-medium mb-3 text-center">Select your current mood</h3>
-            <div class="flex justify-center gap-3 flex-wrap">
-                <button data-mood="happy" class="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900 hover:bg-yellow-200 dark:hover:bg-yellow-800 transition">
-                    <i class="fas fa-smile text-yellow-500 text-xl"></i>
-                </button>
-                <button data-mood="calm" class="p-3 rounded-full bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 transition">
-                    <i class="fas fa-spa text-green-500 text-xl"></i>
-                </button>
-                <button data-mood="neutral" class="p-3 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition">
-                    <i class="fas fa-meh text-gray-500 text-xl"></i>
-                </button>
-                <button data-mood="anxious" class="p-3 rounded-full bg-orange-100 dark:bg-orange-900 hover:bg-orange-200 dark:hover:bg-orange-800 transition">
-                    <i class="fas fa-flushed text-orange-500 text-xl"></i>
-                </button>
-                <button data-mood="sad" class="p-3 rounded-full bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 transition">
-                    <i class="fas fa-sad-tear text-blue-500 text-xl"></i>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Chat Container -->
-        <div id="chat-container" class="flex-1 mb-6 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-y-auto">
-            <!-- Welcome Message -->
-            <div class="welcome-message p-4 bg-serene-100 dark:bg-serene-900 rounded-lg mb-4 message-entering">
-                <p class="text-serene-800 dark:text-serene-200">
-                    <i class="fas fa-heart mr-2 text-serene-500"></i>
-                    Welcome to SereneMind. I'm here to listen without judgment. How are you feeling today?
-                </p>
-            </div>
-            <!-- Messages will appear here -->
-        </div>
-        
-        <!-- Input Area -->
-        <div class="sticky bottom-0 bg-white dark:bg-gray-800 pt-4 pb-6 rounded-t-xl shadow-lg">
-            <div class="flex gap-2">
-                <div class="flex-1 relative">
-                    <textarea 
-                        id="user-input" 
-                        placeholder="Share what's on your mind..." 
-                        rows="1"
-                        class="w-full p-3 pr-10 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-serene-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
-                        aria-label="Mental health chat input"
-                    ></textarea>
-                    <button 
-                        id="mic-button"
-                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-serene-500"
-                        aria-label="Voice input"
-                    >
-                        <i class="fas fa-microphone"></i>
-                    </button>
-                </div>
-                <button 
-                    id="send-btn"
-                    class="bg-serene-600 hover:bg-serene-700 text-white px-5 py-3 rounded-lg transition disabled:opacity-50 flex items-center"
-                    aria-label="Send message"
-                >
-                    <i class="fas fa-paper-plane mr-2"></i>
-                    <span class="hidden sm:inline">Send</span>
-                </button>
-            </div>
-            <div id="safety-resources" class="mt-3 text-center">
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                    In crisis? Contact <a href="https://www.mentalhealth.gov/get-help/immediate-help" class="underline text-serene-600 dark:text-serene-400" target="_blank">professional help</a>
-                </p>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Footer -->
-    <footer class="text-center p-4 text-sm text-gray-500 dark:text-gray-400">
-        <p>SereneMind is not a substitute for professional mental health care</p>
-    </footer>
+<body>
+    <h1>SereneMind</h1>
+    <div id="chatBox"></div>
+    <textarea id="userInput" placeholder="Type your message..."></textarea>
+    <button id="sendButton">Send</button>
 
     <script>
-        // DOM Elements
-        const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const micButton = document.getElementById('mic-button');
-        const moodBanner = document.getElementById('mood-banner');
-        const moodToggle = document.getElementById('mood-toggle');
-        const moodSelector = document.getElementById('mood-selector');
-        let currentMood = null;
-        
-        // Initialize the app
-        function init() {
-            setupEventListeners();
-            loadThemePreference();
-            autoResizeTextarea();
-        }
-        
-        // Event Listeners
-        function setupEventListeners() {
-            // Send message on button click or Shift+Enter
-            sendBtn.addEventListener('click', sendMessage);
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatBox = document.getElementById('chatBox');
+            const userInput = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+
+            // Auto-resize textarea
+            function adjustHeight() {
+                userInput.style.height = 'auto';
+                userInput.style.height = userInput.scrollHeight + 'px';
+            }
+            userInput.addEventListener('input', adjustHeight);
+
+            // Add message to chat
+            function addMessage(text, sender) {
+                const msgDiv = document.createElement('div');
+                msgDiv.textContent = text;
+                msgDiv.className = sender + '-message';
+                chatBox.appendChild(msgDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+
+            // Send message to backend
+            async function sendMessage() {
+                const text = userInput.value.trim();
+                if (!text) return;
+
+                addMessage(text, 'user');
+                userInput.value = '';
+                adjustHeight();
+
+                try {
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: text })
+                    });
+                    const data = await response.json();
+                    addMessage(data.response, 'bot');
+                } catch (error) {
+                    addMessage("Error: Please try again", 'bot');
+                }
+            }
+
+            sendButton.addEventListener('click', sendMessage);
             userInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
                 }
             });
-            
-            // Mood selection
-            moodToggle.addEventListener('click', () => {
-                moodSelector.classList.toggle('hidden');
-            });
-            
-            document.querySelectorAll('[data-mood]').forEach(button => {
-                button.addEventListener('click', () => {
-                    currentMood = button.getAttribute('data-mood');
-                    document.querySelectorAll('[data-mood]').forEach(btn => 
-                        btn.classList.remove('active')
-                    );
-                    button.classList.add('active');
-                    addSystemMessage(`You indicated you're feeling ${currentMood}`);
-                    moodSelector.classList.add('hidden');
-                    moodBanner.classList.add('hidden');
-                });
-            });
-            
-            // Theme toggle (example - implement as needed)
-            // micButton.addEventListener('click', startVoiceInput);
-        }
-        
-        // Message Handling
-        async function sendMessage() {
-            const message = userInput.value.trim();
-            if (!message) return;
-            
-            // Disable input during processing
-            userInput.disabled = true;
-            sendBtn.disabled = true;
-            
-            // Add user message to chat
-            addMessage('user', message);
-            userInput.value = '';
-            
-            try {
-                // Show typing indicator
-                const typingIndicator = addTypingIndicator();
-                
-                // Send to your Flask backend
-                const response = await fetch('/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        message,
-                        mood: currentMood // Include mood context
-                    })
-                });
-                
-                // Remove typing indicator
-                typingIndicator.remove();
-                
-                if (!response.ok) throw new Error('Network response was not ok');
-                
-                const data = await response.json();
-                addMessage('assistant', data.response);
-                
-            } catch (error) {
-                addSystemMessage("I'm having trouble connecting. Please try again later.");
-                console.error('Error:', error);
-            } finally {
-                userInput.disabled = false;
-                sendBtn.disabled = false;
-                userInput.focus();
-            }
-        }
-        
-        // UI Helpers
-        function addMessage(role, content) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message-entering mb-4 p-4 rounded-lg ${
-                role === 'user' 
-                    ? 'ml-auto bg-serene-100 dark:bg-serene-800 max-w-[85%]' 
-                    : role === 'assistant' 
-                        ? 'mr-auto bg-gray-100 dark:bg-gray-700 max-w-[85%]' 
-                        : 'mx-auto bg-caln-100 dark:bg-caln-800 text-center max-w-[90%]'
-            }`;
-            
-            const icon = role === 'user' 
-                ? '<i class="fas fa-user mr-2 text-serene-600"></i>' 
-                : role === 'assistant' 
-                    ? '<i class="fas fa-robot mr-2 text-gray-600 dark:text-gray-400"></i>' 
-                    : '<i class="fas fa-info-circle mr-2 text-caln-600"></i>';
-            
-            messageDiv.innerHTML = `
-                <div class="flex items-center mb-2 ${
-                    role === 'user' 
-                        ? 'text-serene-700 dark:text-serene-300' 
-                        : role === 'assistant' 
-                            ? 'text-gray-700 dark:text-gray-300' 
-                            : 'text-caln-700 dark:text-caln-300'
-                }">
-                    ${icon}
-                    <span class="font-medium">
-                        ${role === 'user' ? 'You' : role === 'assistant' ? 'SereneMind' : 'Note'}
-                    </span>
-                </div>
-                <div class="${
-                    role === 'user' 
-                        ? 'text-serene-900 dark:text-serene-100' 
-                        : role === 'assistant' 
-                            ? 'text-gray-900 dark:text-gray-100' 
-                            : 'text-caln-900 dark:text-caln-100'
-                }">
-                    ${content.replace(/\n/g, '<br>')}
-                </div>
-            `;
-            
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-        
-        function addSystemMessage(content) {
-            addMessage('system', content);
-        }
-        
-        function addTypingIndicator() {
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'typing-indicator mr-auto bg-gray-100 dark:bg-gray-700 p-3 rounded-lg mb-4 max-w-[50%]';
-            typingDiv.innerHTML = `
-                <div class="flex items-center text-gray-700 dark:text-gray-300">
-                    <i class="fas fa-robot mr-2 text-gray-600 dark:text-gray-400"></i>
-                    <span class="font-medium">SereneMind</span>
-                </div>
-                <div class="flex space-x-1 mt-2">
-                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
-                </div>
-            `;
-            chatContainer.appendChild(typingDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            return typingDiv;
-        }
-        
-        // Utility Functions
-        function autoResizeTextarea() {
-            userInput.addEventListener('input', () => {
-                userInput.style.height = 'auto';
-                userInput.style.height = (userInput.scrollHeight) + 'px';
+
+            // Initial bot message
+            addMessage("Hello! How can I help you today?", 'bot');
+        });
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('✅ Service Worker registered'))
+                    .catch(err => console.error('❌ SW failed:', err));
             });
         }
-        
-        function loadThemePreference() {
-            if (localStorage.getItem('theme') === 'dark' || 
-                (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-            }
-        }
-        
-        // Initialize the app
-        init();
     </script>
 </body>
 </html>
