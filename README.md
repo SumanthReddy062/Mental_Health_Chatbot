@@ -7,7 +7,7 @@
 
 A secure web-based chatbot providing mental health support using Flask and Google's Gemini API.
 
-![Chatbot Interface](./preview.png)
+
 ## 🌟 Key Features
 - **AI-Powered Support**: Gemini API for therapeutic conversations
 - **Privacy-First**: No chat history storage
