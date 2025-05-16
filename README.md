@@ -1,38 +1,68 @@
-# Mental Wellness Chat Application
+# 🧠 Mental Wellness Chatbot  
 
-A simple web-based chat application using Python (Flask) and the Gemini API for mental wellness support.
+[![Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue?logo=python)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-2.3-lightgrey?logo=flask)](https://flask.palletsprojects.com/)
+[![Gemini API](https://img.shields.io/badge/Powered_by-Gemini_API-FFCA28?logo=google)](https://ai.google.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Setup
+A secure web-based chatbot providing mental health support using Flask and Google's Gemini API.
 
-1.  **Create a virtual environment:**
-    ```bash
-    python -m venv venv
-    ```
+![Chatbot Interface Preview](https://via.placeholder.com/800x400?text=Chatbot+Interface+Preview)
 
-2.  **Activate the virtual environment:**
-    *   Windows:
-        ```bash
-        .\venv\Scripts\activate
-        ```
-    *   macOS/Linux:
-        ```bash
-        source venv/bin/activate
-        ```
+## 🌟 Key Features
+- **AI-Powered Support**: Gemini API for therapeutic conversations
+- **Privacy-First**: No chat history storage
+- **Easy Setup**: Ready-to-run in <5 minutes
+- **Responsive Design**: Works on all devices
 
-3.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+## 📦 Project Structure
 
-4.  **Set up your Gemini API Key:**
-    Create a `.env` file in the root directory of the project and add your Gemini API key:
-    ```
-    GEMINI_API_KEY=YOUR_API_KEY_HERE
-    ```
+## 🚀 Quick Start
 
-5.  **Run the application:**
-    ```bash
-    python app.py
-    ```
+### Prerequisites
+- Python 3.8+
+- [Gemini API Key](https://ai.google.dev/) (free tier available)
 
-Open your browser and go to `http://127.0.0.1:5000/`.
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/mental-wellness-chat.git
+cd mental-wellness-chat
+
+# Create virtual environment
+python -m venv venv
+
+# Activate environment
+source venv/bin/activate  # Linux/macOS
+.\venv\Scripts\activate   # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure your API key
+cp .env.example .env
+# Edit .env file with your actual API key
+python app.py
+venv/
+.env
+__pycache__/
+
+### Key Additions:
+1. **Visual Preview** - Placeholder for interface screenshot (replace with actual screenshot)
+2. **Complete File Structure** - Shows all critical files
+3. **Security Section** - With explicit .gitignore recommendations
+4. **Configuration Table** - Clear env variable documentation
+5. **How It Works** - Simple architecture explanation
+6. **Acknowledgments** - Professional credits
+
+To use:
+1. Copy this entire content into your `README.md`
+2. Replace placeholder links with your actual GitHub repo
+3. Add real screenshots (upload to repo and update path)
+4. Customize acknowledgments if needed
+
+Would you like me to:
+1. Add a troubleshooting section?
+2. Include deployment instructions for Heroku/AWS?
+3. Add API response examples?
+4. Include a code of conduct?
