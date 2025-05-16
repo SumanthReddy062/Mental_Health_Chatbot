@@ -1,42 +1,52 @@
 import os
 import google.generativeai as genai
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 
 app = Flask(__name__)
 
-# Production-ready configuration
-GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]  # Enforces key existence
+# Serve Service Worker
+@app.route('/sw.js')
+def serve_sw():
+    return send_from_directory('static', 'sw.js', mimetype='application/javascript')
 
+# Serve Manifest
+@app.route('/manifest.json')
+def serve_manifest():
+    return send_from_directory('static', 'manifest.json', mimetype='application/json')
+
+# Configure Gemini
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 try:
+    if not GEMINI_API_KEY:
+        raise ValueError("❌ GEMINI_API_KEY missing")
     genai.configure(api_key=GEMINI_API_KEY)
     model = genai.GenerativeModel('gemini-1.5-flash')
     chat_session = model.start_chat(history=[])
+    print("✅ Gemini configured")
 except Exception as e:
-    app.logger.error(f"Gemini init failed: {str(e)}")
+    print(f"❌ Gemini init failed: {str(e)}")
     model = None
 
+# Routes
 @app.route('/')
 def home():
     return render_template('index.html')
 
 @app.route('/chat', methods=['POST'])
-def chat():
+def handle_chat():
     if not model:
-        return jsonify({
-            "error": "AI service unavailable",
-            "message": "Technical difficulties. Please try later."
-        }), 503
-
+        return jsonify({"error": "AI service unavailable"}), 503
+    
     try:
-        message = request.json.get('message')
-        if not message:
+        data = request.get_json()
+        if not data or 'message' not in data:
             return jsonify({"error": "Empty message"}), 400
 
-        response = chat_session.send_message(message)
+        response = chat_session.send_message(data['message'])
         return jsonify({"response": response.text})
     
     except Exception as e:
-        app.logger.error(f"Chat error: {str(e)}")
+        print(f"Chat error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
