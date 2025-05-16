@@ -1,108 +1,271 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SereneMind | Mental Health Chatbot</title>
-    <meta name="description" content="A compassionate AI companion">
+    <title>SereneMind | Compassionate AI Chat</title>
+    <meta name="description" content="Your safe space for mental wellness conversations">
     
-    <!-- PWA -->
-    <meta name="theme-color" content="#0ea5e9">
+    <!-- PWA Essentials -->
+    <meta name="theme-color" content="#5E81AC">
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/static/icon-192.png">
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
     <style>
+        :root {
+            --primary: #5E81AC;
+            --secondary: #81A1C1;
+            --accent: #88C0D0;
+            --text: #2E3440;
+            --bg: #ECEFF4;
+            --card: #FFFFFF;
+            --bot-bubble: #E5E9F0;
+            --user-bubble: #5E81AC;
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f8fafc;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        #chatBox {
-            height: 70vh;
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .subtitle {
+            opacity: 0.9;
+            font-weight: 300;
+            margin-top: 0.5rem;
+        }
+        
+        #chat-container {
+            flex: 1;
+            padding: 1.5rem;
             overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
-        .user-message { color: blue; margin-left: auto; }
-        .bot-message { color: green; margin-right: auto; }
-        textarea {
-            width: 100%;
-            padding: 8px;
+        
+        .message {
+            max-width: 80%;
+            padding: 1rem 1.25rem;
+            border-radius: 1.25rem;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        .bot-message {
+            background: var(--bot-bubble);
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+        
+        .user-message {
+            background: var(--user-bubble);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+        
+        .input-area {
+            padding: 1rem;
+            background: var(--card);
+            display: flex;
+            gap: 0.75rem;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        #user-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--bot-bubble);
+            border-radius: 1.5rem;
             resize: none;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            max-height: 150px;
+        }
+        
+        #user-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(136, 192, 208, 0.3);
+        }
+        
+        #send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        #send-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        #send-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Dark mode toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <h1>SereneMind</h1>
-    <div id="chatBox"></div>
-    <textarea id="userInput" placeholder="Type your message..."></textarea>
-    <button id="sendButton">Send</button>
+    <header class="animate__animated animate__fadeIn">
+        <h1>SereneMind</h1>
+        <p class="subtitle">Your compassionate AI companion</p>
+        <button class="theme-toggle" id="theme-btn">🌓</button>
+    </header>
+    
+    <div id="chat-container"></div>
+    
+    <div class="input-area">
+        <textarea id="user-input" placeholder="Share what's on your mind..." rows="1"></textarea>
+        <button id="send-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 2L11 13"></path>
+                <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
+            </svg>
+        </button>
+    </div>
 
+    <!-- Your existing script with improved animations -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const chatBox = document.getElementById('chatBox');
-            const userInput = document.getElementById('userInput');
-            const sendButton = document.getElementById('sendButton');
-
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+            const themeBtn = document.getElementById('theme-btn');
+            
+            // Theme toggle
+            themeBtn.addEventListener('click', () => {
+                document.documentElement.setAttribute('data-theme', 
+                    document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+            });
+            
             // Auto-resize textarea
             function adjustHeight() {
                 userInput.style.height = 'auto';
                 userInput.style.height = userInput.scrollHeight + 'px';
             }
             userInput.addEventListener('input', adjustHeight);
-
-            // Add message to chat
+            
+            // Add message with animation
             function addMessage(text, sender) {
                 const msgDiv = document.createElement('div');
+                msgDiv.className = `message ${sender}-message animate__animated animate__fadeInUp`;
                 msgDiv.textContent = text;
-                msgDiv.className = sender + '-message';
-                chatBox.appendChild(msgDiv);
-                chatBox.scrollTop = chatBox.scrollHeight;
+                chatContainer.appendChild(msgDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
             }
-
-            // Send message to backend
+            
+            // Send message
             async function sendMessage() {
                 const text = userInput.value.trim();
                 if (!text) return;
-
+                
                 addMessage(text, 'user');
                 userInput.value = '';
                 adjustHeight();
-
+                
                 try {
+                    sendBtn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4m0 12v4m-7-7H3m18 0h-2M5.6 5.6l1.4 1.4m9.9 9.9l1.4 1.4M5.6 18.4l1.4-1.4m9.9-9.9l1.4-1.4"></path></svg>`;
+                    
                     const response = await fetch('/chat', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ message: text })
                     });
+                    
                     const data = await response.json();
                     addMessage(data.response, 'bot');
                 } catch (error) {
-                    addMessage("Error: Please try again", 'bot');
+                    addMessage("I'm having trouble connecting. Please try again later.", 'bot');
+                } finally {
+                    sendBtn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4 20-7z"></path></svg>`;
                 }
             }
-
-            sendButton.addEventListener('click', sendMessage);
+            
+            sendBtn.addEventListener('click', sendMessage);
             userInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
                 }
             });
-
-            // Initial bot message
-            addMessage("Hello! How can I help you today?", 'bot');
+            
+            // Initial welcome message
+            setTimeout(() => {
+                addMessage("Hello! I'm SereneMind, your mental wellness companion. How can I support you today?", 'bot');
+            }, 500);
         });
-
-        // PWA Service Worker Registration
+        
+        // PWA Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('✅ Service Worker registered'))
-                    .catch(err => console.error('❌ SW failed:', err));
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.error('SW registration failed:', err));
             });
         }
     </script>
